@@ -24,7 +24,7 @@ public class AutomatedFetcher<DataType:Any> : ObservableObject {
     }
     /// Indicates whether or not the instance should be fetching or not
     public var shouldFetch:Bool {
-        return fetching && lastFetch.timeIntervalSinceNow < timeInterval
+        return fetching == false && lastFetch.addingTimeInterval(timeInterval).timeIntervalSinceNow <= 0 
     }
     
     /// Instantiates a new AutomatedFetcher instance.
