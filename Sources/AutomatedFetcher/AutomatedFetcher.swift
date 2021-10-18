@@ -61,6 +61,40 @@ public class AutomatedFetcher<DataType:Any> : ObservableObject {
         .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
     }
     
+    /// Instantiates a new AutomatedFetcher instance.
+    /// - Parameters:
+    ///   - subject: a subject used to trigger a fetch
+    ///   - lastFetch: last fetch occured
+    ///   - isOn: activated or deactivated
+    ///   - timeInterval: the TimeInterval of each fetch
+    /// - Note: The subject is used to monitor subscriptions to a publisher. If a publisher lacks subscribes, then fethcing a new value is clearly not neccessary.
+    public init(_ subject:PassthroughSubject<DataType,Error>, lastFetch date:Date? = nil, isOn:Bool = true, timeInterval:TimeInterval = 60) {
+        self.timeInterval = timeInterval
+        self.isOn = isOn
+        self.lastFetch = date ?? Date().addingTimeInterval(timeInterval * -1 - 1)
+        triggered = triggeredSubject.eraseToAnyPublisher()
+        configure()
+        subjectCancellable = subject.handleEvents(receiveSubscription: subscriptionRecieved)
+        .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+    }
+    
+    /// Instantiates a new AutomatedFetcher instance
+    /// - Parameters:
+    ///   - subject: a subject used to trigger a fetch
+    ///   - lastFetch: last fetch occured
+    ///   - isOn: activated or deactivated
+    ///   - timeInterval: the TimeInterval of each fetch
+    /// - Note: The subject is used to monitor subscriptions to a publisher. If a publisher lacks subscribes, then fethcing a new value is clearly not neccessary.
+    public init(_ subject:PassthroughSubject<DataType,Never>, lastFetch date:Date? = nil, isOn:Bool = true, timeInterval:TimeInterval = 60) {
+        self.timeInterval = timeInterval
+        self.isOn = isOn
+        self.lastFetch = date ?? Date().addingTimeInterval(timeInterval * -1 - 1)
+        triggered = triggeredSubject.eraseToAnyPublisher()
+        configure()
+        subjectCancellable = subject.handleEvents(receiveSubscription: subscriptionRecieved)
+        .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+    }
+    
     /// Triggeres whenever the data subject recieves a subscription
     /// - Parameter sub: the subscriber
     private func subscriptionRecieved(_ sub: Subscription) {
