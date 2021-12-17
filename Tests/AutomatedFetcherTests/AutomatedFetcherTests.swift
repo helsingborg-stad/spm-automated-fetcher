@@ -63,11 +63,21 @@ final class AutomatedFetcherTests: XCTestCase {
         let currentValue = "Start"
         let value = CurrentValueSubject<String,Never>(currentValue)
         let fetcher = AutomatedFetcher<String>(value, isOn: true, timeInterval: 2)
-        
+        var count = 0
         fetcher.triggered.sink {
-            expectation.fulfill()
+            debugPrint("triggered")
+            count += 1
+            if count == 2 {
+                expectation.fulfill()
+            }
         }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 2.0)
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
+            fetcher.isOn = false
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { timer in
+                fetcher.isOn = true
+            }
+        }
+        wait(for: [expectation], timeout: 10.0)
     }
     func testNoSubscribers() {
         let expectation = XCTestExpectation(description: "testNoSubscribers")
