@@ -1,4 +1,8 @@
 # AutomatedFetcher
+## DEPRECATED
+Package will not recieve any updates, please use the AutomatedFetcher library in https://github.com/helsingborg-stad/spm-daisy instead.
+
+## About
 
 A support libarary to manage automatic network fetches. The library was created in order to standardize automatic fetches across network libraries. 
 
